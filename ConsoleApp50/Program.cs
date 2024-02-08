@@ -1,83 +1,96 @@
-﻿using ConsoleApp50;
-using System.ComponentModel;
-
-public class Program
+﻿namespace ConsoleApp50
 {
-    private static void Main(string[] args)
+    public class Program
     {
-        Tanks tank1 = new Tanks() { Name = "об.777", Age = "17", National = "USSR" };
-        Tanks tank2 = new Tanks() { Name = "Maus", National = "Germane", Age = "45" };
-        Tanks tank3 = new Tanks() { Name = "Ис-7", National = "USSR", Age = "39" };
-        Tanks tank4 = new Tanks() { Name = "Aмx-30-B", National = "France", Age = "25" };
-
-
-        Console.WriteLine("Привет! Это игра битва танков");
-        Random random = new Random();
-        Console.ReadLine();
-        Console.WriteLine("Выбери свой танк: \n об.777, Maus, Ис-7, Амх-30-B ");
-        int healtc1 = random.Next(50, 100);
-        int healtc2 = random.Next(50, 100);
-        int damage1 = random.Next(20, 40);
-        int damage2 = random.Next(20, 40);
-        int damage3 = random.Next(20, 40);
-        int damage4 = random.Next(20, 40);
-        int healtc3 = random.Next(50, 100);
-        int healtc4 = random.Next(50, 100);//и это надо бы в лист добавить 
-        string  info = Console.ReadLine();
-      
-      
-        if (info == null)
+        private static void Main()
         {
-            return;
+            List<Tank> tanks = new()
+            {
+                new HeavyTank("Об.777", "USSR"),
+                new HeavyTank("Маус", "Germany"),
+                new HeavyTank("ИС-7", "USSR"),
+                new MediumTank("AMX-30-B", "France")
+            };
+
+            Random random = new();
+            foreach (var tank in tanks)
+            {
+                tank.Health = random.Next(50, 100);
+                tank.Damage = random.Next(20, 40);
+            }
+
+            Console.WriteLine("Привет! Это игра битва танков");
+
+            for (var i = 0; i < tanks.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}) {tanks.ElementAt(i).Info()}");
+            }
+
+            Tank myTank;
+            if (int.TryParse(Console.ReadLine(), out var choice))
+            {
+                try
+                {
+                    myTank = tanks.ElementAt(choice);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    Console.ReadLine();
+                    return;
+                }
+            }
+            else
+            {
+                return;
+            }
+
+            Console.WriteLine("Отличный выбор!");
+            Console.WriteLine("Чтобы начать битву напишите 'Battle' ");
+
+            var fight = Console.ReadLine()?.ToLower() ?? throw new InvalidOperationException();
+            if (fight != "battle") return;
+            Console.WriteLine(War(myTank, tanks) ? "Ты победил!" : "Ты проиграл!");
         }
-        if (info == "об.777")
-        {
-            Console.WriteLine($"Параметры об.777: \n Название - {tank1.Name}\n Страна - {tank1.National}\n Кол-во лет - {tank1.Age} \n  Урон - {damage1} " +
-                $"\n Защита - {healtc1}");
-            
-        }
-         else if (info =="Maus")
-        {
-            Console.WriteLine($"Параметры Maus: \n Название - {tank2.Name} \n Страна - {tank2.National}\n Кол-во лет - {tank2.Age}" +
-              $"\n Урон - {damage2} \n Защита - {healtc2}"  ) ;
-            
-        }
-        else if(info == "Ис-7")
-        {
-            Console.WriteLine($"Параметры Ис-7: \n Название - {tank3.Name} \n Страна - {tank3.National}\n Кол-во лет - {tank3.Age}" +
-              $"\n Урон - {damage3} \n Защита - {healtc3}");
 
-        }
-        else if(info == "Aмх-30-В")
+        private static bool War(Tank playerTank, List<Tank> tanks)
         {
-            Console.WriteLine($"Параметры Амх-30-В: \n Название - {tank4.Name} \n Страна - {tank4.National}\n Кол-во лет - {tank4.Age}" +
-              $"\n Урон - {damage4} \n Защита - {healtc4}");
+            Random random = new();
+            var opponent = tanks.ElementAt(random.Next(0, tanks.Count - 1));
+            Console.WriteLine($"Твой соперник: {opponent.Info}");
+            if (random.Next(0, 1) == 1)
+            {
+                Console.WriteLine("Вы стреляете первым");
+                while (playerTank.Health > 0)
+                {
+                    playerTank.Health -= opponent.Damage;
+                    opponent.Health -= playerTank.Damage;
+                    Console.WriteLine($"Вы обменялись выстрелами.\nУ вас осталось {playerTank.Health} здоровья.");
+                    if (opponent.Health < 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Ваш оппонент выстрелил первым");
+                while (playerTank.Health > 0)
+                {
+                    playerTank.Health -= opponent.Damage;
+                    opponent.Health -= playerTank.Damage;
+                    Console.WriteLine($"Вы обменялись выстрелами.\nУ вас осталось {playerTank.Health} здоровья.");
+                    if (opponent.Health < 0)
+                    {
+                        return true;
+                    }
+                }
+            }
 
-        }
-        Console.WriteLine("Отличный выбор, выше его характеристика");
-        Console.ReadLine();
-
-        Console.WriteLine("Чтобы начать битву напишите 'Battle' ");
-
-        string fiht = Console.ReadLine();
-        if (fiht == "Battle")
-        {
-            War();
+            return false;
         }
     }
-    static void War()
-    {
-        Random rnd = new Random();
-        string[] opponent = { "Maus", "Ис-7", "об.777", "Амх-30-В" };
-      
-        Console.WriteLine($"Твой соперник: {opponent}"); // кароч нужно чтобы рандомно выбирал соперника 
-    }
-
-
-
-
 }
-
 
 
 
