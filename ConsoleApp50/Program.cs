@@ -57,7 +57,7 @@
         {
             Random random = new();
             var opponent = tanks.ElementAt(random.Next(0, tanks.Count - 1));
-            Console.WriteLine($"Твой соперник: {opponent.Info}");
+            Console.WriteLine($"Твой соперник: {opponent.Info()}");
             if (random.Next(0, 1) == 1)
             {
                 Console.WriteLine("Вы стреляете первым");
